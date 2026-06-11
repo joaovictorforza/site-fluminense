@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluminense Football Club</title>
+    <style>
+        /* ── Tokens ── */
+        :root {
+            --bg:        #f5f5f0;
+            --surface:   #ffffff;
+            --border:    #e0ddd6;
+            --text:      #1a1a1a;
+            --muted:     #666;
+            --accent:    #8b1a2e;
+            --accent2:   #2e6b2e;
+            --accent3:   #f0f0f0;
+            --shadow:    0 2px 12px rgba(0,0,0,.08);
+            --radius:    10px;
+            --transition: .3s ease;
+        }
+        body.dark {
+            --bg:      #111;
+            --surface: #1c1c1c;
+            --border:  #333;
+            --text:    #f0f0f0;
+            --muted:   #aaa;
+            --accent3: #252525;
+            --shadow:  0 2px 12px rgba(0,0,0,.4);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background var(--transition), color var(--transition);
+            line-height: 1.7;
+        }
+
+        /* ── Header ── */
+        header {
+            background: linear-gradient(135deg, var(--accent) 0%, #5a0e1e 100%);
+            color: #fff;
+            padding: 3rem 1.5rem 2.2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 30px;
+            background: var(--bg);
+            clip-path: ellipse(55% 100% at 50% 100%);
+            transition: background var(--transition);
+        }
+        header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 50px;
+            padding: .25rem .9rem;
+            font-size: .78rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: .8rem;
+        }
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -.5px;
+        }
+        header .sub {
+            margin-top: .4rem;
+            font-size: 1rem;
+            opacity: .8;
+        }
+
+        /* ── Toggle tema ── */
+        #toggle-theme {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: rgba(255,255,255,.18);
+            border: 1.5px solid rgba(255,255,255,.4);
+            color: #fff;
+            border-radius: 50px;
+            padding: .45rem 1rem;
+            font-size: .82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            transition: background .2s;
+            z-index: 10;
+        }
+        #toggle-theme:hover { background: rgba(255,255,255,.3); }
+
+        /* ── Main ── */
+        main {
+            max-width: 820px;
+            margin: 1.5rem auto 2rem;
+            padding: 0 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ── Animação scroll ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .55s ease, transform .55s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Cards ── */
+        section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.6rem 1.8rem;
+            box-shadow: var(--shadow);
+            transition: background var(--transition), border-color var(--transition);
+        }
+        section h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: .9rem;
+            padding-bottom: .5rem;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        /* ── Contador de estatísticas ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            margin-top: .3rem;
+        }
+        .stat-card {
+            background: var(--accent3);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: background var(--transition);
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+            display: block;
+        }
+        .stat-label {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-top: .3rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        /* ── Títulos list ── */
+        ul { list-style: none; padding: 0; }
+        ul li {
+            padding: .5rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        ul li:last-child { border-bottom: none; }
+        ul li::before { content: "🏆"; font-size: .85rem; }
+
+        /* ── Curiosidades ── */
+        #curiosidade-box {
+            background: var(--accent3);
+            border-left: 4px solid var(--accent2);
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            font-size: .97rem;
+            min-height: 3.5rem;
+            transition: opacity .3s;
+            margin-bottom: 1rem;
+        }
+        #btn-curiosidade {
+            background: var(--accent2);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .6rem 1.3rem;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .2s, transform .15s;
+        }
+        #btn-curiosidade:hover { opacity: .88; transform: translateY(-1px); }
+        #btn-curiosidade:active { transform: translateY(0); }
+
+        /* ── Avaliação por estrelas ── */
+        .stars-wrapper { display: flex; flex-direction: column; gap: .8rem; }
+        .star-row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+        .star-row label { font-size: .92rem; min-width: 120px; }
+        .stars { display: flex; gap: .2rem; }
+        .star {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ccc;
+            transition: color .15s, transform .15s;
+            user-select: none;
+        }
+        .star:hover,
+        .star.hovered,
+        .star.selected { color: #f4b400; transform: scale(1.15); }
+        .star-msg {
+            font-size: .82rem;
+            color: var(--muted);
+            margin-top: .3rem;
+            min-height: 1.2em;
+            font-style: italic;
+        }
+
+        /* ── Vídeo ── */
+        .video-container {
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        .video-container iframe { width: 100%; height: 100%; border: 0; }
+
+        /* ── Links ── */
+        a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 1.8rem;
+            font-size: .85rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button id="toggle-theme" onclick="toggleTheme()" aria-label="Alternar modo claro/escuro">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-label">Modo Escuro</span>
+        </button>
+        <div class="badge">Fundado em 1902</div>
+        <h1>Fluminense Football Club</h1>
+        <p class="sub">O orgulho das Laranjeiras 🔴⚪🟢</p>
+    </header>
+
+    <main>
+
+        <!-- Estatísticas animadas -->
+        <section class="reveal">
+            <h2>📊 O Flu em Números</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" data-target="4">0</span>
+                    <span class="stat-label">Brasileirão</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" data-target="1">0</span>
+                    <span class="stat-label">Libertadores</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" data-target="1">0</span>
+                    <span class="stat-label">Recopa</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" data-target="31">0</span>
+                    <span class="stat-label">Cariocas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" data-target="122">0</span>
+                    <span class="stat-label">Anos de história</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Títulos -->
+        <section class="reveal">
+            <h2>🥇 Títulos Mais Importantes</h2>
+            <ul>
+                <li><strong>Campeonato Brasileiro:</strong> 4 títulos (1970, 1984, 2010, 2012)</li>
+                <li><strong>Copa Libertadores da América:</strong> 1 título (2023)</li>
+                <li><strong>Recopa Sul-Americana:</strong> 1 título (2024)</li>
+                <li><strong>Campeonato Carioca:</strong> 31 títulos</li>
+            </ul>
+        </section>
+
+        <!-- Curiosidades -->
+        <section class="reveal">
+            <h2>💡 Curiosidades sobre o Flu</h2>
+            <div id="curiosidade-box">Clique no botão para descobrir uma curiosidade!</div>
+            <button id="btn-curiosidade" onclick="novaCuriosidade()">🎲 Nova Curiosidade</button>
+        </section>
+
+        <!-- Avaliação por estrelas -->
+        <section class="reveal">
+            <h2>⭐ Avalie o Fluminense</h2>
+            <div class="stars-wrapper">
+
+                <div class="star-row">
+                    <label>Elenco atual</label>
+                    <div class="stars" id="stars-elenco" data-id="elenco">
+                        <span class="star" data-val="1">★</span>
+                        <span class="star" data-val="2">★</span>
+                        <span class="star" data-val="3">★</span>
+                        <span class="star" data-val="4">★</span>
+                        <span class="star" data-val="5">★</span>
+                    </div>
+                </div>
+
+                <div class="star-row">
+                    <label>História do clube</label>
+                    <div class="stars" id="stars-historia" data-id="historia">
+                        <span class="star" data-val="1">★</span>
+                        <span class="star" data-val="2">★</span>
+                        <span class="star" data-val="3">★</span>
+                        <span class="star" data-val="4">★</span>
+                        <span class="star" data-val="5">★</span>
+                    </div>
+                </div>
+
+                <div class="star-row">
+                    <label>Torcida</label>
+                    <div class="stars" id="stars-torcida" data-id="torcida">
+                        <span class="star" data-val="1">★</span>
+                        <span class="star" data-val="2">★</span>
+                        <span class="star" data-val="3">★</span>
+                        <span class="star" data-val="4">★</span>
+                        <span class="star" data-val="5">★</span>
+                    </div>
+                </div>
+
+            </div>
+            <p class="star-msg" id="star-msg"></p>
+        </section>
+
+        <!-- Vídeo -->
+        <section class="reveal">
+            <h2>🎬 Bastidores da Libertadores 2023</h2>
+            <div class="video-container">
+                <iframe
+                    src="https://www.youtube.com/embed/YBq3iklVQg4"
+                    title="Bastidores Libertadores 2023 – Fluminense"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
+        <!-- Instagram -->
+        <section class="reveal">
+            <h2>📸 Instagram Oficial</h2>
+            <p>
+                Acompanhe o Flu no Instagram:
+                <a href="https://www.instagram.com/fluminensefc/" target="_blank" rel="noopener">
+                    @fluminensefc
+                </a>
+            </p>
+        </section>
+
+        <!-- Sobre -->
+        <section class="reveal">
+            <h2>📖 Sobre o Clube</h2>
+            <p>
+                Fundado em 1902, o Fluminense é um dos clubes mais tradicionais do Brasil.
+                Com uma história rica e uma torcida apaixonada, foi um dos primeiros <em>football clubs</em>
+                do mundo, inspirando outros clubes. O título mais importante saiu dos pés de John Kennedy,
+                21 anos, com um chutaço que entrou para a história. Manda seus jogos no Maracanã
+                e possui as cores verde, branco e grená.
+            </p>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 — Página sobre o Fluminense Football Club</p>
+    </footer>
+
+    <script>
+        // ── 1. Modo Claro / Escuro ──────────────────────────────
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark');
+            document.getElementById('theme-icon').textContent  = isDark ? '☀️' : '🌙';
+            document.getElementById('theme-label').textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
+            localStorage.setItem('tema', isDark ? 'dark' : 'light');
+        }
+        (function aplicarTema() {
+            if (localStorage.getItem('tema') === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('theme-icon').textContent  = '☀️';
+                document.getElementById('theme-label').textContent = 'Modo Claro';
+            }
+        })();
+
+        // ── 2. Curiosidades Aleatórias ──────────────────────────
+        const curiosidades = [
+            "O Fluminense foi fundado em 21 de julho de 1902 por Oscar Cox, um estudante que trouxe o futebol da Europa para o Brasil.",
+            "As cores grená, branco e verde do Fluminense são conhecidas como as cores do 'Tricolor das Laranjeiras'.",
+            "O Maracanã, palco dos jogos do Flu, é um dos maiores estádios do mundo, com capacidade para cerca de 78 mil pessoas.",
+            "John Kennedy marcou o gol do título da Libertadores 2023 ao substituir Cano e finalizar de primeira na prorrogação.",
+            "O apelido 'Pó de Arroz' surgiu porque jogadores do clube passavam pó de arroz no rosto antes dos jogos.",
+            "O Fluminense foi o clube que revelou Romário, um dos maiores centroavantes da história do futebol mundial.",
+            "A sede social do Fluminense fica nas Laranjeiras, bairro que deu origem a um dos seus apelidos mais famosos.",
+            "A Libertadores de 2023 foi conquistada com vitória de 2×1 sobre o Boca Juniors na final, no Maracanã.",
+            "O Fluminense conquistou a Recopa Sul-Americana em 2024, logo após vencer a Libertadores.",
+            "Thiago Silva, um dos melhores defensores da história do futebol brasileiro, saiu das categorias de base do Flu."
+        ];
+        let ultimaIndex = -1;
+        function novaCuriosidade() {
+            const box = document.getElementById('curiosidade-box');
+            let idx;
+            do { idx = Math.floor(Math.random() * curiosidades.length); } while (idx === ultimaIndex);
+            ultimaIndex = idx;
+            box.style.opacity = '0';
+            setTimeout(() => { box.textContent = curiosidades[idx]; box.style.opacity = '1'; }, 200);
+        }
+        novaCuriosidade();
+
+        // ── 3. Contador animado de estatísticas ─────────────────
+        function animarContador(el, target, duracao) {
+            let start = null;
+            function step(ts) {
+                if (!start) start = ts;
+                const progress = Math.min((ts - start) / duracao, 1);
+                el.textContent = Math.floor(progress * target);
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target;
+            }
+            requestAnimationFrame(step);
+        }
+        let contadoresAnimados = false;
+        function ativarContadores() {
+            if (contadoresAnimados) return;
+            const numeros = document.querySelectorAll('.stat-number');
+            numeros.forEach(el => {
+                const target = parseInt(el.dataset.target);
+                animarContador(el, target, 1400);
+            });
+            contadoresAnimados = true;
+        }
+
+        // ── 4. Animação ao scroll ────────────────────────────────
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Aciona contadores quando a seção de stats aparecer
+                    if (entry.target.querySelector('.stats-grid')) ativarContadores();
+                }
+            });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+
+        // ── 5. Avaliação por estrelas ────────────────────────────
+        const msgs = ['', 'Que pena... 😢', 'Pode melhorar! 😐', 'Razoável 🙂', 'Muito bom! 😄', 'Simplesmente o melhor! 🏆🔥'];
+        const avaliacoes = {};
+
+        document.querySelectorAll('.stars').forEach(grupo => {
+            const id = grupo.dataset.id;
+            avaliacoes[id] = 0;
+            const stars = grupo.querySelectorAll('.star');
+
+            stars.forEach(star => {
+                // Hover
+                star.addEventListener('mouseenter', () => {
+                    const val = +star.dataset.val;
+                    stars.forEach(s => {
+                        s.classList.toggle('hovered', +s.dataset.val <= val);
+                        s.classList.remove('selected');
+                    });
+                });
+                // Mouse saiu — restaura estado salvo
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach(s => {
+                        s.classList.remove('hovered');
+                        s.classList.toggle('selected', +s.dataset.val <= avaliacoes[id]);
+                    });
+                });
+                // Clique
+                star.addEventListener('click', () => {
+                    const val = +star.dataset.val;
+                    avaliacoes[id] = val;
+                    stars.forEach(s => {
+                        s.classList.remove('hovered');
+                        s.classList.toggle('selected', +s.dataset.val <= val);
+                    });
+                    // Mensagem geral com base na média
+                    const valores = Object.values(avaliacoes).filter(v => v > 0);
+                    if (valores.length) {
+                        const media = valores.reduce((a,b) => a+b, 0) / valores.length;
+                        document.getElementById('star-msg').textContent = msgs[Math.round(media)];
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
